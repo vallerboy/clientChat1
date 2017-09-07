@@ -1,5 +1,6 @@
 package pl.oskarpolak.controllers;
 
+import com.google.gson.reflect.TypeToken;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
@@ -7,7 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import pl.oskarpolak.models.ChatSocket;
 import pl.oskarpolak.models.IMessageObserver;
+import pl.oskarpolak.models.MessageFactory;
 
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.ResourceBundle;
@@ -39,14 +42,34 @@ public class Controller implements Initializable, IMessageObserver {
 
         textMessage.setOnKeyPressed(s -> {
             if(s.getCode() == KeyCode.ENTER){
-                socket.sendMessage(textMessage.getText());
+                sendMessagePacket(textMessage.getText());
                 textMessage.clear();
             }
         });
     }
 
+
     @Override
     public void handleMessage(String s) {
-        textMessages.appendText(s + "\n");
+        Type token = new TypeToken<MessageFactory>() {}.getType();
+        MessageFactory factory = MessageFactory.GSON.fromJson(s, token);
+
+        switch (factory.getMessageType()){
+            case SEND_MESSAGE: {
+                textMessages.appendText("\n" + factory.getMessage());
+                break;
+            }
+        }
+    }
+
+    private void sendMessagePacket(String message) {
+        MessageFactory factory = new MessageFactory();
+        factory.setMessageType(MessageFactory.MessageType.SEND_MESSAGE);
+        factory.setMessage(message);
+        sendMessage(factory);
+    }
+
+    private void sendMessage(MessageFactory factory){
+        socket.sendMessage(MessageFactory.GSON.toJson(factory));
     }
 }
