@@ -67,6 +67,17 @@ public class Controller implements Initializable, IMessageObserver {
                 Platform.runLater(() -> sendNickPacket(DialogUtils.createNickDialog(factory.getMessage())));
                 break;
             }
+            case USER_JOIN: {
+                // ze ten case sie przyda, gdy bedziemy miec liste userow jako widok
+                textMessages.appendText("\n" + "~~> " + factory.getMessage() + " <~~");
+                break;
+            }
+            case USER_LEFT: {
+                // ze ten case sie przyda, gdy bedziemy miec liste userow jako widok
+                textMessages.appendText("\n" + "<~~ " + factory.getMessage() + " ~~>");
+                break;
+            }
+
 
         }
     }

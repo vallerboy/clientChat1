@@ -53,7 +53,7 @@ public class ChatSocket {
 
     public void connect(){
         try {
-            webSocketContainer.connectToServer(this, new URI("ws://localhost:8080/chat"));
+            webSocketContainer.connectToServer(this, new URI("ws://192.168.1.37:8080/chat"));
         } catch (DeploymentException e) {
             e.printStackTrace();
         } catch (IOException e) {
