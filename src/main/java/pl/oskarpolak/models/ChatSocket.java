@@ -15,11 +15,22 @@ public class ChatSocket {
 
     private WebSocketContainer webSocketContainer;
     private Session session;
+    private IMessageObserver observer;
+
     private ChatSocket() {
         webSocketContainer  = ContainerProvider.getWebSocketContainer();
     }
 
 
+
+
+    public IMessageObserver getObserver() {
+        return observer;
+    }
+
+    public void setObserver(IMessageObserver observer) {
+        this.observer = observer;
+    }
 
     @OnOpen
     public void open(Session session){
@@ -29,7 +40,7 @@ public class ChatSocket {
 
     @OnMessage
     public void message(Session session, String message){
-        //ta metoda wykona sie gdy do klienta przyjdzie wiadomosc
+       observer.handleMessage(message);
     }
 
     public void sendMessage(String message){
