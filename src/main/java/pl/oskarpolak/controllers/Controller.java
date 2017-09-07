@@ -1,11 +1,13 @@
 package pl.oskarpolak.controllers;
 
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import pl.oskarpolak.DialogUtils;
 import pl.oskarpolak.models.ChatSocket;
 import pl.oskarpolak.models.IMessageObserver;
 import pl.oskarpolak.models.MessageFactory;
@@ -34,6 +36,8 @@ public class Controller implements Initializable, IMessageObserver {
 
     public void initialize(URL location, ResourceBundle resources) {
         socket.connect();
+        sendNickPacket(DialogUtils.createNickDialog(null));
+
         textMessage.requestFocus();
         textMessages.setWrapText(true);
 
@@ -59,7 +63,19 @@ public class Controller implements Initializable, IMessageObserver {
                 textMessages.appendText("\n" + factory.getMessage());
                 break;
             }
+            case NICK_NOT_FREE: {
+                Platform.runLater(() -> sendNickPacket(DialogUtils.createNickDialog(factory.getMessage())));
+                break;
+            }
+
         }
+    }
+
+    private void sendNickPacket(String nick){
+        MessageFactory factory = new MessageFactory();
+        factory.setMessageType(MessageFactory.MessageType.SET_NICK);
+        factory.setMessage(nick);
+        sendMessage(factory);
     }
 
     private void sendMessagePacket(String message) {
